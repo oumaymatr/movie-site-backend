@@ -12,6 +12,24 @@ export class BookmarkController {
     return this.bookmarkService.findAll();
   }
 
+  @Get('user/:userId')
+  async findByUserId(@Param('userId') userId: string): Promise<Bookmark[]> {
+    return this.bookmarkService.findByUserId(userId);
+  }
+
+  @Get('movie/:movieId')
+  async findByMovieId(@Param('movieId') movieId: string): Promise<Bookmark[]> {
+    return this.bookmarkService.findByMovieId(movieId);
+  }
+
+  @Get('user/:userId/movie/:movieId')
+  async findByUserIdAndMovieId(
+    @Param('userId') userId: string,
+    @Param('movieId') movieId: string,
+  ): Promise<Bookmark> {
+    return this.bookmarkService.findByUserIdAndMovieId(userId, movieId);
+  }
+
   @Post()
   async create(
     @Body() createBookmarkDto: CreateBookmarkDto,

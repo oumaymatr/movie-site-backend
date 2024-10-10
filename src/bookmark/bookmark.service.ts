@@ -23,6 +23,21 @@ export class BookmarkService {
     return this.bookmarkModel.findById(id).exec();
   }
 
+  async findByUserId(userId: string): Promise<Bookmark[]> {
+    return this.bookmarkModel.find({ userId }).exec();
+  }
+
+  async findByMovieId(movieId: string): Promise<Bookmark[]> {
+    return this.bookmarkModel.find({ movieId }).exec();
+  }
+
+  async findByUserIdAndMovieId(
+    userId: string,
+    movieId: string,
+  ): Promise<Bookmark> {
+    return this.bookmarkModel.findOne({ userId, movieId }).exec();
+  }
+
   async remove(id: string): Promise<Bookmark> {
     return this.bookmarkModel.findByIdAndDelete(id).exec();
   }
