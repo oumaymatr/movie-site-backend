@@ -23,6 +23,7 @@ export class AuthService {
     const isPasswordValid = await bcrypt.compare(pass, user.mot_de_passe);
     if (isPasswordValid) {
       this.logger.debug(`Password valid for user: ${email}`);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { mot_de_passe, ...result } = user.toObject();
       return result;
     }
@@ -57,6 +58,7 @@ export class AuthService {
     });
 
     // Retourner l'utilisateur sans le mot de passe
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { mot_de_passe, ...result } = newUser.toObject();
     return result;
   }
