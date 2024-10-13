@@ -12,7 +12,7 @@ export class User extends Document {
   @Prop({ required: true })
   mot_de_passe: string;
 
-  @Prop()
+  @Prop({ default: '' })
   photo_de_profil: string;
 
   @Prop({ default: Date.now })
