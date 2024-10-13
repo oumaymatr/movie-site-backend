@@ -7,6 +7,7 @@ import { BookmarkModule } from './bookmark/bookmark.module';
 import { AuthModule } from './auth/auth.module';
 import { AdminModule } from './admin/admin.module';
 import { ConfigModule } from '@nestjs/config';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
   imports: [
@@ -16,6 +17,9 @@ import { ConfigModule } from '@nestjs/config';
     BookmarkModule,
     AuthModule,
     AdminModule,
+    MulterModule.register({
+      dest: './uploads', // Set your upload directory
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
