@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './schemas/user.schema';
@@ -45,5 +45,32 @@ export class UserService {
     return this.userModel
       .findByIdAndUpdate(id, updateUserDto, { new: true })
       .exec();
+  }
+
+  async addBookmark(userId: string, movieId: string) {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Add the movieId to the bookmarks array if it's not already bookmarked
+    if (!user.bookmarks.includes(movieId)) {
+      user.bookmarks.push(movieId);
+      await user.save();
+    }
+    return user;
+  }
+
+  async getUserBookmarks(userId: string): Promise<string[]> {
+    const user = await this.userModel.findById(userId).select('bookmarks');
+    return user.bookmarks;
+  }
+
+  async removeBookmark(userId: string, movieId: string): Promise<User> {
+    return this.userModel.findByIdAndUpdate(
+      userId,
+      { $pull: { bookmarks: movieId } }, // Assuming 'bookmarks' is an array field in the user model
+      { new: true }, // Return the updated document
+    );
   }
 }

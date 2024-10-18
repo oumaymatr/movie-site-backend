@@ -20,6 +20,9 @@ export class User extends Document {
 
   @Prop({ default: 'user' })
   role: string;
+
+  @Prop({ type: [String], default: [] })
+  bookmarks: string[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

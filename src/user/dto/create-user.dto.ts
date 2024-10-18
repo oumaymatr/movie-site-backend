@@ -4,6 +4,8 @@ import {
   IsOptional,
   IsString,
   IsIn,
+  IsArray,
+  ArrayNotEmpty,
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -27,4 +29,10 @@ export class CreateUserDto {
   @IsString()
   @IsIn(['user', 'admin'])
   role?: string;
+
+  @IsOptional()
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsString({ each: true })
+  bookmarks?: string[];
 }
