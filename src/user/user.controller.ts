@@ -16,9 +16,7 @@ import {
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './schemas/user.schema';
-import { diskStorage } from 'multer';
 import { Types } from 'mongoose';
-import { extname } from 'path';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { AuthGuard } from '@nestjs/passport'; // or your custom guard
@@ -27,30 +25,10 @@ import { AuthGuard } from '@nestjs/passport'; // or your custom guard
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Put(':id/profile-picture')
-  @UseInterceptors(
-    FileInterceptor('photo_de_profil', {
-      storage: diskStorage({
-        destination: './uploads', // Folder where files will be saved
-        filename: (req, file, cb) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          cb(null, uniqueSuffix + extname(file.originalname)); // Store files with unique names
-        },
-      }),
-    }),
-  )
-  async updateProfilePicture(
-    @Param('id') id: string,
-    @UploadedFile() file: Express.Multer.File, // Get the uploaded file
-  ): Promise<User> {
-    const photoDeProfil = file.path; // Save the file path
-    return this.userService.update(id, { photo_de_profil: photoDeProfil });
-  }
-
   @Post()
   async create(@Body() createUserDto: CreateUserDto): Promise<User> {
     console.log('Received signup request:', createUserDto);
+    createUserDto.setDefaultProfilePicture();
     return this.userService.create(createUserDto);
   }
 
@@ -146,5 +124,26 @@ export class UserController {
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<User> {
     return this.userService.findOne(id);
+  }
+  @Post(':id/upload-photo')
+  @UseInterceptors(FileInterceptor('photo'))
+  async uploadPhoto(
+    @Param('id') userId: string,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const photoUrl = await this.userService.updateProfilePicture(userId, file);
+    return { photoUrl }; // Send the new photo URL back in the response
+  }
+  @UseGuards(AuthGuard('jwt'))
+  @Get(':id/profile-picture')
+  async getUserById(@Param('id') id: string) {
+    // Use @Req() instead of @Request()
+    const user = await this.userService.findOne(id); // Fetch user by ID
+    if (user) {
+      return {
+        photo_de_profil: user.photo_de_profil, // Return only the profile picture
+      };
+    }
+    return { message: 'User not found' }; // Handle case where user is not found
   }
 }

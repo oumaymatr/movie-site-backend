@@ -23,7 +23,7 @@ export class CreateUserDto {
 
   @IsOptional()
   @IsString()
-  photo_de_profil?: string;
+  photo_de_profil?: string; // This should allow undefined but not empty string
 
   @IsOptional()
   @IsString()
@@ -35,4 +35,12 @@ export class CreateUserDto {
   @ArrayNotEmpty()
   @IsString({ each: true })
   bookmarks?: string[];
+
+  // Consider adding a method to set the default profile picture if not provided
+  setDefaultProfilePicture() {
+    if (!this.photo_de_profil) {
+      this.photo_de_profil =
+        'https://static.vecteezy.com/system/resources/previews/026/434/409/non_2x/default-avatar-profile-icon-social-media-user-photo-vector.jpg';
+    }
+  }
 }

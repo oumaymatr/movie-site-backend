@@ -12,8 +12,11 @@ export class User extends Document {
   @Prop({ required: true })
   mot_de_passe: string;
 
-  @Prop({ default: '' })
-  photo_de_profil: string;
+  @Prop({
+    default:
+      'https://static.vecteezy.com/system/resources/previews/026/434/409/non_2x/default-avatar-profile-icon-social-media-user-photo-vector.jpg',
+  })
+  photo_de_profil?: string;
 
   @Prop({ default: Date.now })
   date_de_creation: Date;

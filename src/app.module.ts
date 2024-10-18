@@ -8,6 +8,8 @@ import { AuthModule } from './auth/auth.module';
 import { AdminModule } from './admin/admin.module';
 import { ConfigModule } from '@nestjs/config';
 import { MulterModule } from '@nestjs/platform-express';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -19,6 +21,10 @@ import { MulterModule } from '@nestjs/platform-express';
     AdminModule,
     MulterModule.register({
       dest: './uploads', // Set your upload directory
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads/', // Adjust this path based on your setup
     }),
   ],
   controllers: [AppController],

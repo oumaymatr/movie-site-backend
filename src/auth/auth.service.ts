@@ -40,7 +40,7 @@ export class AuthService {
   }
 
   async signup(createUserDto: CreateUserDto) {
-    // Vérifier si l'utilisateur existe déjà
+    // Check if the user already exists
     const existingUser = await this.userService.findByEmail(
       createUserDto.email,
     );
@@ -48,17 +48,26 @@ export class AuthService {
       throw new Error('User already exists');
     }
 
-    // Hasher le mot de passe
+    // Hash the password
     const hashedPassword = await bcrypt.hash(createUserDto.mot_de_passe, 10);
 
-    // Créer le nouvel utilisateur
-    const newUser = await this.userService.create({
-      ...createUserDto,
-      mot_de_passe: hashedPassword,
-    });
+    // Create a new instance of CreateUserDto
+    const newUserDto = new CreateUserDto();
 
-    // Retourner l'utilisateur sans le mot de passe
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // Populate it with the incoming data
+    newUserDto.nom_d_utilisateur = createUserDto.nom_d_utilisateur;
+    newUserDto.email = createUserDto.email;
+    newUserDto.mot_de_passe = hashedPassword; // Don't forget to set the hashed password
+    newUserDto.role = createUserDto.role;
+    newUserDto.bookmarks = createUserDto.bookmarks;
+
+    // Set the default profile picture
+    newUserDto.setDefaultProfilePicture();
+
+    // Create the new user
+    const newUser = await this.userService.create(newUserDto);
+
+    // Return the user without the password
     const { mot_de_passe, ...result } = newUser.toObject();
     return result;
   }
