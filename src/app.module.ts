@@ -10,6 +10,7 @@ import { ConfigModule } from '@nestjs/config';
 import { MulterModule } from '@nestjs/platform-express';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { join } from 'path';
     MongooseModule.forRoot(process.env.MONGODB_URI),
     MoviesModule,
     BookmarkModule,
+    EmailModule,
     AuthModule,
     AdminModule,
     MulterModule.register({

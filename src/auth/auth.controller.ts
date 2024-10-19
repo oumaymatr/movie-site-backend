@@ -7,6 +7,8 @@ import {
   Logger,
   HttpException,
   HttpStatus,
+  Get,
+  Query,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
@@ -50,6 +52,38 @@ export class AuthController {
     } catch (error) {
       this.logger.error(`Signup failed: ${error.message}`);
       throw new HttpException('Signup failed', HttpStatus.BAD_REQUEST);
+    }
+  }
+  @Post('forgot-password')
+  async forgotPassword(@Body() { email }: { email: string }): Promise<void> {
+    return this.authService.forgotPassword(email);
+  }
+
+  @Post('reset-password')
+  async resetPassword(
+    @Body() body: { token: string; newPassword: string },
+  ): Promise<void> {
+    return this.authService.resetPassword(body.token, body.newPassword);
+  }
+  @Get('reset-password')
+  async verifyResetToken(@Query('token') token: string) {
+    try {
+      // Await the token verification to resolve the promise
+      console.log('i am here');
+      this.logger.log('fucking here');
+      const decoded = await this.authService.verifyResetToken(token);
+      // If the token is valid, return a response
+      this.logger.log(decoded);
+      return {
+        message: 'Token is valid. You can proceed to reset your password.',
+        email: decoded.email, // Now you can access email
+      };
+    } catch (error) {
+      this.logger.error(`Invalid token: ${error.message}`);
+      throw new HttpException(
+        'Invalid or expired token',
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 }

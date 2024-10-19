@@ -1,8 +1,15 @@
-import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class AuthService {
@@ -11,6 +18,7 @@ export class AuthService {
   constructor(
     private userService: UserService,
     private jwtService: JwtService,
+    private emailService: EmailService,
   ) {}
 
   async validateUser(email: string, pass: string): Promise<any> {
@@ -68,5 +76,45 @@ export class AuthService {
     // Return the user without the password
     const { mot_de_passe, ...result } = newUser.toObject();
     return result;
+  }
+
+  async forgotPassword(email: string): Promise<void> {
+    const user = await this.userService.findByEmail(email);
+    if (!user) {
+      throw new NotFoundException(`No user found for email: ${email}`);
+    }
+    // Generate token
+    const token = this.jwtService.sign(
+      { email: user.email },
+      { expiresIn: '1h' },
+    );
+    // Send email with reset link
+    await this.emailService.sendResetPasswordLink(user.email, token);
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    // Decode and verify token
+    const decoded = this.jwtService.verify(token);
+    const user = await this.userService.findByEmail(decoded.email);
+    if (!user) {
+      throw new NotFoundException(`No user found for email: ${decoded.email}`);
+    }
+
+    // Hash new password and save
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.mot_de_passe = hashedPassword;
+    await user.save();
+  }
+
+  async verifyResetToken(token: string) {
+    try {
+      const decoded = this.jwtService.verify(token); // Verify the token
+      return decoded; // Return the decoded payload if valid
+    } catch (error) {
+      throw new HttpException(
+        'Invalid or expired token',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 }

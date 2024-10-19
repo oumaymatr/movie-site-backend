@@ -9,10 +9,12 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { RolesGuard } from './roles.guard';
 import { APP_GUARD } from '@nestjs/core';
+import { EmailModule } from '../email/email.module';
 
 @Module({
   imports: [
     UserModule,
+    EmailModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: 'votre_secret_jwt', // Utilisez une variable d'environnement en production
