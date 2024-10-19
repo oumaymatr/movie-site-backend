@@ -28,7 +28,15 @@ export class AuthController {
       return result;
     } catch (error) {
       this.logger.error(`Login failed: ${error.message}`);
-      throw new HttpException('Login failed', HttpStatus.UNAUTHORIZED);
+      // Here we can differentiate between user not found and incorrect password
+      if (error instanceof HttpException) {
+        throw error; // Propagate the HTTP exception to send the proper status code and message
+      } else {
+        throw new HttpException(
+          'An unexpected error occurred',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
     }
   }
 

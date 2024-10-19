@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -18,19 +18,17 @@ export class AuthService {
     const user = await this.userService.findByEmail(email);
     if (!user) {
       this.logger.debug(`User not found: ${email}`);
-      return null;
+      throw new HttpException('User does not exist', HttpStatus.NOT_FOUND); // Use specific HTTP exception
     }
     const isPasswordValid = await bcrypt.compare(pass, user.mot_de_passe);
     if (isPasswordValid) {
       this.logger.debug(`Password valid for user: ${email}`);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { mot_de_passe, ...result } = user.toObject();
       return result;
     }
     this.logger.debug(`Password invalid for user: ${email}`);
-    return null;
+    throw new HttpException('Incorrect password', HttpStatus.UNAUTHORIZED); // Use specific HTTP exception
   }
-
   async login(user: any) {
     this.logger.debug(`Generating JWT for user: ${user.email}`);
     const payload = { email: user.email, sub: user._id, role: user.role };
