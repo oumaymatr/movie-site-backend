@@ -15,6 +15,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user-dto';
 import { User } from './schemas/user.schema';
 import { Types } from 'mongoose';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -51,6 +52,14 @@ export class UserController {
     @Body('email') email: string,
   ): Promise<User> {
     return this.userService.update(id, { email });
+  }
+
+  @Put(':id')
+  async updateUser(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto, // Use your existing DTO
+  ): Promise<User> {
+    return this.userService.update(id, updateUserDto);
   }
 
   @Post('upload')

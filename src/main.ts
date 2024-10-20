@@ -1,4 +1,5 @@
 import { Logger } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import * as path from 'path';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
@@ -18,6 +19,7 @@ async function bootstrap() {
   app.useStaticAssets(path.join(__dirname, '..', 'uploads'), {
     prefix: '/uploads',
   });
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   logger.log('Application is starting...');
 

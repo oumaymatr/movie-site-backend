@@ -17,4 +17,8 @@ export class UpdateUserDto {
   @IsOptional()
   @IsString()
   photo_de_profil?: string;
+
+  @IsOptional()
+  @IsString()
+  role?: string;
 }
